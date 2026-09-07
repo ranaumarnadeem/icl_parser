@@ -1192,8 +1192,13 @@ class IclScanRegister(IclItem):
         return self.get_item_all_named_indexes(self.icl_name)[-1]
         
     def get_scanin_named_index(self) -> str:
+        # ScanInSource is conventionally a single bit (the register's real serial
+        # shift-in point), but a whole same-width port reference (e.g. a
+        # synthesized-netlist-style `ScanInSource SI[4:0];` on a 5-bit register) is
+        # also valid ICL -- its own bit 0 (this codebase's own MSB convention, see
+        # get_named_msb()) is exactly the bit that feeds this register's MSB.
         scan_in = self.get_signal_all_named_indexes(self.instance, [self.scan_in])
-        assert(len(scan_in) == 1)
+        assert(len(scan_in) >= 1)
         return scan_in[0]
 
     def get_scancapture_named_index(self) -> str:
